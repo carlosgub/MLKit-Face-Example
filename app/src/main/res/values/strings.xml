@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MLKit Firebase</string>
+    <string name="imagen_tomada">Imagen Tomada</string>
+    <string name="take_photo">Tomar Foto</string>
+</resources>
