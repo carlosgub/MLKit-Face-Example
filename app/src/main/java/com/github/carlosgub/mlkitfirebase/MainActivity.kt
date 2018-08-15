@@ -10,6 +10,9 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.wonderkiln.camerakit.*
 import kotlinx.android.synthetic.main.activity_main.*
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
+
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -71,8 +74,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun runTextRecognition(bitmap:Bitmap){
+        var options = FirebaseVisionFaceDetectorOptions.Builder()
+                .setModeType(FirebaseVisionFaceDetectorOptions.ACCURATE_MODE)
+                .setLandmarkType(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
+                .setClassificationType(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+                .setMinFaceSize(0.15f)
+                .setTrackingEnabled(true)
+                .build()
         val image = FirebaseVisionImage.fromBitmap(bitmap)
-        val detector = FirebaseVision.getInstance().visionFaceDetector
+        val detector = FirebaseVision.getInstance().getVisionFaceDetector(options)
         detector.detectInImage(image)
                 .addOnSuccessListener({
 
@@ -90,7 +100,7 @@ class MainActivity : AppCompatActivity() {
         mGraphicOverlay.clear()
         for(i in firebaseVisionList){
             val textGraphic = FaceGraphic(mGraphicOverlay)
-            textGraphic.updateFace(i)
+            textGraphic.updateFace(i,mCameraView.facing)
             mGraphicOverlay.add(textGraphic)
         }
     }
