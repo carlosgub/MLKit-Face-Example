@@ -18,10 +18,6 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.View
 import com.google.android.gms.vision.CameraSource
-import android.text.method.TextKeyListener.clear
-
-
-
 
 /**
  * A view which renders a series of custom graphics to be overlayed on top of an associated preview

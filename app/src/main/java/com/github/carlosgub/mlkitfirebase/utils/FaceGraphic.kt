@@ -20,8 +20,19 @@ class FaceGraphic(overlay: GraphicOverlay) : Graphic(overlay) {
     @Volatile
     private var firebaseVisionFace: FirebaseVisionFace? = null
 
-    init {
+    /** Instanciar las variables que no se modificaran despues*/
+    companion object {
+        private val FACE_POSITION_RADIUS = 10.0f
+        private val ID_TEXT_SIZE = 40.0f
+        private val ID_Y_OFFSET = 50.0f
+        private val ID_X_OFFSET = -50.0f
+        private val BOX_STROKE_WIDTH = 5.0f
+        private val COLOR_CHOICES = intArrayOf(Color.BLUE, Color.CYAN, Color.GREEN, Color.MAGENTA, Color.RED, Color.WHITE, Color.YELLOW)
+        private var currentColorIndex = 0
+    }
 
+    /** Obtener el color para el cuadrado y los puntos de la cara */
+    init {
         currentColorIndex = (currentColorIndex + 1) % COLOR_CHOICES.size
         val selectedColor = COLOR_CHOICES[currentColorIndex]
 
@@ -38,9 +49,9 @@ class FaceGraphic(overlay: GraphicOverlay) : Graphic(overlay) {
         boxPaint.strokeWidth = BOX_STROKE_WIDTH
     }
 
+
     /**
-     * Updates the face instance from the detection of the most recent frame. Invalidates the relevant
-     * portions of the overlay to trigger a redraw.
+     * Agregar las caras detectadas al Canvas
      */
     fun updateFace(face: FirebaseVisionFace, facing: Int) {
         firebaseVisionFace = face
@@ -48,7 +59,7 @@ class FaceGraphic(overlay: GraphicOverlay) : Graphic(overlay) {
         postInvalidate()
     }
 
-    /** Draws the face annotations for position on the supplied canvas.  */
+    /** Dibujar el cuadrado y los puntos de la cara en el Canvas  */
     override fun draw(canvas: Canvas) {
         val face = firebaseVisionFace ?: return
 
@@ -62,6 +73,8 @@ class FaceGraphic(overlay: GraphicOverlay) : Graphic(overlay) {
                 x + ID_X_OFFSET * 3,
                 y - ID_Y_OFFSET,
                 idPaint)
+
+        /** Logica de los ojos segun la camara que se este usando */
         if (facing == CameraSource.CAMERA_FACING_FRONT) {
             canvas.drawText(
                     "right eye: " + String.format("%.2f", face.rightEyeOpenProbability),
@@ -86,7 +99,7 @@ class FaceGraphic(overlay: GraphicOverlay) : Graphic(overlay) {
                     idPaint)
         }
 
-        // Draws a bounding box around the face.
+        /** Dibujar el cuadrado alrededor de la cara*/
         val xOffset = scaleX(face.boundingBox.width() / 2.0f)
         val yOffset = scaleY(face.boundingBox.height() / 2.0f)
         val left = x - xOffset
@@ -95,7 +108,7 @@ class FaceGraphic(overlay: GraphicOverlay) : Graphic(overlay) {
         val bottom = y + yOffset
         canvas.drawRect(left, top, right, bottom, boxPaint)
 
-        // draw landmarks
+        /** Dibujar en la cara los diferentes puntos que detecta la libreria de firebase */
         drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.BOTTOM_MOUTH)
         drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_CHEEK)
         drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_EAR)
@@ -108,6 +121,7 @@ class FaceGraphic(overlay: GraphicOverlay) : Graphic(overlay) {
         drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_MOUTH)
     }
 
+    /** Dibujar los puntos */
     private fun drawLandmarkPosition(canvas: Canvas, face: FirebaseVisionFace, landmarkID: Int) {
         val landmark = face.getLandmark(landmarkID)
         if (landmark != null) {
@@ -117,16 +131,5 @@ class FaceGraphic(overlay: GraphicOverlay) : Graphic(overlay) {
                     translateY(point.y!!),
                     10f, idPaint)
         }
-    }
-
-    companion object {
-        private val FACE_POSITION_RADIUS = 10.0f
-        private val ID_TEXT_SIZE = 40.0f
-        private val ID_Y_OFFSET = 50.0f
-        private val ID_X_OFFSET = -50.0f
-        private val BOX_STROKE_WIDTH = 5.0f
-
-        private val COLOR_CHOICES = intArrayOf(Color.BLUE, Color.CYAN, Color.GREEN, Color.MAGENTA, Color.RED, Color.WHITE, Color.YELLOW)
-        private var currentColorIndex = 0
     }
 }
