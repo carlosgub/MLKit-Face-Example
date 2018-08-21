@@ -1,16 +1,12 @@
 package com.github.carlosgub.mlkitfirebase.presentation.views
 
 import android.Manifest
-import android.content.Context
-import android.content.CursorLoader
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.support.media.ExifInterface
 import android.support.v4.app.ActivityCompat
@@ -19,12 +15,16 @@ import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.github.carlosgub.mlkitfirebase.R
 import com.github.carlosgub.mlkitfirebase.utils.FaceGraphic
+import com.github.carlosgub.mlkitfirebase.utils.PathUtil
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import kotlinx.android.synthetic.main.activity_galeria.*
 import java.io.IOException
+import android.graphics.drawable.BitmapDrawable
+
+
 
 
 class GaleriaActivity : AppCompatActivity() {
@@ -35,7 +35,6 @@ class GaleriaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_galeria)
-
         btGaleria.setOnClickListener{
             getPermission()
         }
@@ -43,7 +42,7 @@ class GaleriaActivity : AppCompatActivity() {
 
     private fun intent(){
         /** Intent hacia la galeria */
-        val intentGallery = Intent(Intent.ACTION_GET_CONTENT)
+        val intentGallery = Intent(Intent.ACTION_OPEN_DOCUMENT)
         intentGallery.putExtra(Intent.EXTRA_LOCAL_ONLY, true)
         intentGallery.addCategory(Intent.CATEGORY_OPENABLE)
         intentGallery.type = "image/*"
@@ -60,16 +59,14 @@ class GaleriaActivity : AppCompatActivity() {
 
             if (data.data != null) {
                 var bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, Uri.parse(data.data.toString()))
-                bitmap =  modifyOrientation(bitmap,getFilePath(applicationContext,data.data))
+                bitmap =  modifyOrientation(bitmap,PathUtil.getPath(applicationContext,data.data))
                 ivPhoto.setImageBitmap(bitmap)
-                /** Limpiar la pantalla de lo anteriormente dibujado */
-                mGraphicOverlayMenu.setCameraInfo(ivPhoto.drawable.intrinsicWidth,ivPhoto.drawable.intrinsicHeight,0)
 
-                runFaceRecognition(bitmap)
+                mGraphicOverlayMenu.setCameraInfo(ivPhoto.drawable.intrinsicWidth,ivPhoto.drawable.intrinsicHeight,0)
+                runFaceRecognition((ivPhoto.drawable as BitmapDrawable).bitmap)
             } else{
                 Toast.makeText(this, "You haven't picked any Image",
                         Toast.LENGTH_LONG).show()
-
             }
 
         }
@@ -108,11 +105,12 @@ class GaleriaActivity : AppCompatActivity() {
         /** Opciones de la libreria */
         val options = FirebaseVisionFaceDetectorOptions.Builder()
                 .setModeType(FirebaseVisionFaceDetectorOptions.ACCURATE_MODE)
-                .setLandmarkType(FirebaseVisionFaceDetectorOptions.NO_LANDMARKS)
-                .setClassificationType(FirebaseVisionFaceDetectorOptions.NO_CLASSIFICATIONS)
+                .setLandmarkType(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
+                .setClassificationType(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
                 .setMinFaceSize(0.15f)
                 .setTrackingEnabled(true)
                 .build()
+
 
         /** Obtener la imagen tomada de la camara*/
         val image = FirebaseVisionImage.fromBitmap(bitmap)
@@ -124,6 +122,8 @@ class GaleriaActivity : AppCompatActivity() {
         detector.detectInImage(image)
                 .addOnSuccessListener{processFaceRecognitionResult(it)}
                 .addOnFailureListener{Toast.makeText(this,it.toString(),Toast.LENGTH_LONG).show()}
+
+        detector.close()
     }
 
     private fun processFaceRecognitionResult(firebaseVisionList: List<FirebaseVisionFace>){
@@ -139,7 +139,7 @@ class GaleriaActivity : AppCompatActivity() {
 
         /** Logica para dibujar cada cara */
         for(i in firebaseVisionList){
-            val textGraphic = FaceGraphic(mGraphicOverlayMenu,false)
+            val textGraphic = FaceGraphic(mGraphicOverlayMenu,true)
             textGraphic.updateFace(i,0)
             mGraphicOverlayMenu.add(textGraphic)
         }
@@ -178,61 +178,5 @@ class GaleriaActivity : AppCompatActivity() {
         val matrix = Matrix()
         matrix.preScale((if (horizontal) -1 else 1).toFloat(), (if (vertical) -1 else 1).toFloat())
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-    }
-
-    /** Obtener el Path de la imagen */
-    private fun getFilePath(context: Context, uri: Uri): String {
-        val currentApiVersion: Int = try {
-            android.os.Build.VERSION.SDK_INT
-        } catch (e: NumberFormatException) {
-            //API 3 will crash if SDK_INT is called
-            3
-        }
-
-        if (currentApiVersion >= Build.VERSION_CODES.KITKAT) {
-            var filePath = ""
-            val wholeID = DocumentsContract.getDocumentId(uri)
-
-            // Split at colon, use second item in the array
-            val id = wholeID.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]
-
-            val column = arrayOf(MediaStore.Images.Media.DATA)
-
-            // where id is equal to
-            val sel = MediaStore.Images.Media._ID + "=?"
-
-            val cursor = context.contentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    column, sel, arrayOf(id), null)
-
-            val columnIndex = cursor.getColumnIndex(column[0])
-
-            if (cursor.moveToFirst()) {
-                filePath = cursor.getString(columnIndex)
-            }
-            cursor.close()
-            return filePath
-        } else if (currentApiVersion <= Build.VERSION_CODES.HONEYCOMB_MR2 && currentApiVersion >= Build.VERSION_CODES.HONEYCOMB) {
-            val proj = arrayOf(MediaStore.Images.Media.DATA)
-            var result = ""
-
-            val cursorLoader = CursorLoader(
-                    context,
-                    uri, proj, null, null, null)
-            val cursor = cursorLoader.loadInBackground()
-
-            if (cursor != null) {
-                val column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-                cursor.moveToFirst()
-                result = cursor.getString(column_index)
-            }
-            return result
-        } else {
-            val proj = arrayOf(MediaStore.Images.Media.DATA)
-            val cursor = context.contentResolver.query(uri, proj, null, null, null)
-            val column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            cursor.moveToFirst()
-            cursor.close()
-            return cursor.getString(column_index)
-        }
     }
 }
