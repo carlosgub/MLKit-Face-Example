@@ -1,4 +1,4 @@
-package com.github.carlosgub.mlkitfirebase
+package com.github.carlosgub.mlkitfirebase.presentation.views
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
@@ -8,6 +8,7 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
+import com.github.carlosgub.mlkitfirebase.R
 import com.github.carlosgub.mlkitfirebase.utils.FaceGraphic
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
@@ -117,8 +118,8 @@ class MainActivity : AppCompatActivity() {
 
         /** Detectar caras en la imagen */
         detector.detectInImage(image)
-                .addOnSuccessListener({processFaceRecognitionResult(it)})
-                .addOnFailureListener({Toast.makeText(this,it.toString(),Toast.LENGTH_LONG).show()})
+                .addOnSuccessListener{processFaceRecognitionResult(it)}
+                .addOnFailureListener{Toast.makeText(this,it.toString(),Toast.LENGTH_LONG).show()}
     }
 
     private fun processFaceRecognitionResult(firebaseVisionList: List<FirebaseVisionFace>){
@@ -134,7 +135,7 @@ class MainActivity : AppCompatActivity() {
 
         /** Logica para dibujar cada cara */
         for(i in firebaseVisionList){
-            val textGraphic = FaceGraphic(mGraphicOverlay)
+            val textGraphic = FaceGraphic(mGraphicOverlay,true)
             textGraphic.updateFace(i,mCameraView.facing)
             mGraphicOverlay.add(textGraphic)
         }

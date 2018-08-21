@@ -9,13 +9,16 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark
 
 
-class FaceGraphic(overlay: GraphicOverlay) : Graphic(overlay) {
+class FaceGraphic(overlay: GraphicOverlay,mostrarLandmarks: Boolean) : Graphic(overlay) {
 
     private var facing: Int = 0
 
     private val facePositionPaint: Paint
     private val idPaint: Paint
     private val boxPaint: Paint
+    private var mostrarLandmarks = false
+
+
 
     @Volatile
     private var firebaseVisionFace: FirebaseVisionFace? = null
@@ -33,6 +36,8 @@ class FaceGraphic(overlay: GraphicOverlay) : Graphic(overlay) {
 
     /** Obtener el color para el cuadrado y los puntos de la cara */
     init {
+
+        this.mostrarLandmarks = mostrarLandmarks
         currentColorIndex = (currentColorIndex + 1) % COLOR_CHOICES.size
         val selectedColor = COLOR_CHOICES[currentColorIndex]
 
@@ -51,7 +56,7 @@ class FaceGraphic(overlay: GraphicOverlay) : Graphic(overlay) {
 
 
     /**
-     * Agregar las caras detectadas al Canvas
+     * Agrega las caras detectadas al Canvas
      */
     fun updateFace(face: FirebaseVisionFace, facing: Int) {
         firebaseVisionFace = face
@@ -59,47 +64,14 @@ class FaceGraphic(overlay: GraphicOverlay) : Graphic(overlay) {
         postInvalidate()
     }
 
-    /** Dibujar el cuadrado y los puntos de la cara en el Canvas  */
+    /** Dibuja el cuadrado y los puntos de la cara en el Canvas  */
     override fun draw(canvas: Canvas) {
         val face = firebaseVisionFace ?: return
 
-        // Draws a circle at the position of the detected face, with the face's track id below.
         val x = translateX(face.boundingBox.centerX().toFloat())
         val y = translateY(face.boundingBox.centerY().toFloat())
-        canvas.drawCircle(x, y, FACE_POSITION_RADIUS, facePositionPaint)
-        canvas.drawText("id: " + face.trackingId, x + ID_X_OFFSET, y + ID_Y_OFFSET, idPaint)
-        canvas.drawText(
-                "happiness: " + String.format("%.2f", face.smilingProbability),
-                x + ID_X_OFFSET * 3,
-                y - ID_Y_OFFSET,
-                idPaint)
 
-        /** Logica de los ojos segun la camara que se este usando */
-        if (facing == CameraSource.CAMERA_FACING_FRONT) {
-            canvas.drawText(
-                    "right eye: " + String.format("%.2f", face.rightEyeOpenProbability),
-                    x - ID_X_OFFSET,
-                    y,
-                    idPaint)
-            canvas.drawText(
-                    "left eye: " + String.format("%.2f", face.leftEyeOpenProbability),
-                    x + ID_X_OFFSET * 6,
-                    y,
-                    idPaint)
-        } else {
-            canvas.drawText(
-                    "left eye: " + String.format("%.2f", face.leftEyeOpenProbability),
-                    x - ID_X_OFFSET,
-                    y,
-                    idPaint)
-            canvas.drawText(
-                    "right eye: " + String.format("%.2f", face.rightEyeOpenProbability),
-                    x + ID_X_OFFSET * 6,
-                    y,
-                    idPaint)
-        }
-
-        /** Dibujar el cuadrado alrededor de la cara*/
+        /** Dibuja el cuadrado alrededor de la cara*/
         val xOffset = scaleX(face.boundingBox.width() / 2.0f)
         val yOffset = scaleY(face.boundingBox.height() / 2.0f)
         val left = x - xOffset
@@ -108,20 +80,55 @@ class FaceGraphic(overlay: GraphicOverlay) : Graphic(overlay) {
         val bottom = y + yOffset
         canvas.drawRect(left, top, right, bottom, boxPaint)
 
-        /** Dibujar en la cara los diferentes puntos que detecta la libreria de firebase */
-        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.BOTTOM_MOUTH)
-        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_CHEEK)
-        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_EAR)
-        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_MOUTH)
-        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_EYE)
-        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.NOSE_BASE)
-        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_CHEEK)
-        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EAR)
-        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EYE)
-        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_MOUTH)
+        if(mostrarLandmarks) {
+            canvas.drawCircle(x, y, FACE_POSITION_RADIUS, facePositionPaint)
+            canvas.drawText("id: " + face.trackingId, x + ID_X_OFFSET, y + ID_Y_OFFSET, idPaint)
+            canvas.drawText(
+                    "happiness: " + String.format("%.2f", face.smilingProbability),
+                    x + ID_X_OFFSET * 3,
+                    y - ID_Y_OFFSET,
+                    idPaint)
+
+            /** Logica de los ojos segun la camara que se este usando */
+            if (facing == CameraSource.CAMERA_FACING_FRONT) {
+                canvas.drawText(
+                        "right eye: " + String.format("%.2f", face.rightEyeOpenProbability),
+                        x - ID_X_OFFSET,
+                        y,
+                        idPaint)
+                canvas.drawText(
+                        "left eye: " + String.format("%.2f", face.leftEyeOpenProbability),
+                        x + ID_X_OFFSET * 6,
+                        y,
+                        idPaint)
+            } else {
+                canvas.drawText(
+                        "left eye: " + String.format("%.2f", face.leftEyeOpenProbability),
+                        x - ID_X_OFFSET,
+                        y,
+                        idPaint)
+                canvas.drawText(
+                        "right eye: " + String.format("%.2f", face.rightEyeOpenProbability),
+                        x + ID_X_OFFSET * 6,
+                        y,
+                        idPaint)
+            }
+
+            /** Dibuja en la cara los diferentes puntos que detecta la libreria de firebase */
+            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.BOTTOM_MOUTH)
+            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_CHEEK)
+            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_EAR)
+            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_MOUTH)
+            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_EYE)
+            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.NOSE_BASE)
+            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_CHEEK)
+            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EAR)
+            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EYE)
+            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_MOUTH)
+        }
     }
 
-    /** Dibujar los puntos */
+    /** Dibuja los puntos */
     private fun drawLandmarkPosition(canvas: Canvas, face: FirebaseVisionFace, landmarkID: Int) {
         val landmark = face.getLandmark(landmarkID)
         if (landmark != null) {

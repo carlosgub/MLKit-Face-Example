@@ -2,4 +2,6 @@
     <string name="app_name">MLKit Firebase</string>
     <string name="imagen_tomada">Imagen Tomada</string>
     <string name="take_photo">Tomar Foto</string>
+    <string name="imagen">imagen</string>
+    <string name="elegir_foto_de_la_galeria">Elegir foto de la galeria</string>
 </resources>
