@@ -1,4 +1,4 @@
-# MLKit-Face-Example
+# MLKit-Face-Example <a href="https://codeclimate.com/github/carlosgub/MLKit-Face-Example"><img src="https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/maintainability" /></a>
 Este es un ejemplo de la libreria de MLKit de Firebase
 
 Este ejemplo reconoce a las personas cuando se captura la imagen con la camara o cuando se selecciona alguna imagen de la galeria.
