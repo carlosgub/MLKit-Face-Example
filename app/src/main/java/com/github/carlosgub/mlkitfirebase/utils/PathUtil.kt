@@ -26,7 +26,7 @@ class PathUtil {
             when {
                 isExternalStorageDocument(uri) -> {
                     val docId = DocumentsContract.getDocumentId(uri)
-                    val split = docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                    val split = getDocumentsContract(docId)
                     return Environment.getExternalStorageDirectory().toString() + "/" + split[1]
                 }
                 isDownloadsDocument(uri) -> {
@@ -36,7 +36,7 @@ class PathUtil {
                 }
                 isMediaDocument(uri) -> {
                     val docId = DocumentsContract.getDocumentId(uri)
-                    val split = docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                    val split = getDocumentsContract(docId)
                     val type = split[0]
                     if ("image" == type) {
                         uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -93,5 +93,9 @@ class PathUtil {
      */
     private fun isMediaDocument(uri: Uri): Boolean {
         return "com.android.providers.media.documents" == uri.authority
+    }
+
+    private fun getDocumentsContract(docId:String):Array<String>{
+        return docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
     }
 }
