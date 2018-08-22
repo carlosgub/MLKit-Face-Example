@@ -10,11 +10,9 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import java.net.URISyntaxException
 
-
+/** Clase para obtener el Path del archivo seleccionado de la Galeria*/
 class PathUtil {
-    /*
-     * Gets the file path of the given Uri.
-     */
+
     @SuppressLint("NewApi")
     @Throws(URISyntaxException::class)
     fun getPath(context: Context, uris: Uri): String? {
@@ -68,18 +66,21 @@ class PathUtil {
         return docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
     }
 
+    /** Que hacer si el Uri se encuentra en exteneralstorage.documents del celular */
     private fun doWhenUriIsExternalStorageDocument(uri:Uri):String{
         val docId = DocumentsContract.getDocumentId(uri)
         val split = getDocumentsContract(docId)
         return Environment.getExternalStorageDirectory().toString() + "/" + split[1]
     }
 
+    /** Que hacer si el Uri se encuentra en la carpeta downloads.documents del celular */
     private fun doWhenUriIsDownloadsDocument(uri: Uri):Uri{
         val id = DocumentsContract.getDocumentId(uri)
         return ContentUris.withAppendedId(
                 Uri.parse("content://downloads/public_downloads"), java.lang.Long.valueOf(id))
     }
 
+    /** Que hacer si el Uri se encuentra en el carpeta media.Documets del celular */
     private fun doWhenUriIsMediaDocument(uri: Uri):Result{
         var uri = uri
         val docId = DocumentsContract.getDocumentId(uri)
@@ -95,6 +96,7 @@ class PathUtil {
         return Result(uri,selection,selectionArgs)
     }
 
+    /** Obtener el Path */
     private fun searchPath(context: Context,uri:Uri,selection: String?,selectionArgs: Array<String>?) : String?{
         val projection = arrayOf(MediaStore.Images.Media.DATA)
         val cursor: Cursor?
@@ -111,5 +113,6 @@ class PathUtil {
         return null
     }
 
+    /** Objeto creado que se solo se usa en esta clase */
     data class Result(var uri: Uri, var selection: String?, var selectionArgs:Array<String>?)
 }
