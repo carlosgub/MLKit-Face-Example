@@ -17,34 +17,29 @@ class PathUtil {
      */
     @SuppressLint("NewApi")
     @Throws(URISyntaxException::class)
-    fun getPath(context: Context, uri: Uri): String? {
-        var uri = uri
-        var selection: String? = null
-        var selectionArgs: Array<String>? = null
-        if (DocumentsContract.isDocumentUri(context.applicationContext, uri)) {
+    fun getPath(context: Context, uris: Uri): String? {
+        var result = Result(uris,null,null)
+        if (DocumentsContract.isDocumentUri(context.applicationContext, result.uri)) {
             when {
-                isExternalStorageDocument(uri) -> {
-                    return doWhenUriIsExternalStorageDocument(uri)
+                isExternalStorageDocument(result.uri) -> {
+                    return doWhenUriIsExternalStorageDocument(result.uri)
                 }
-                isDownloadsDocument(uri) -> {
-                    uri = doWhenUriIsDownloadsDocument(uri)
+                isDownloadsDocument(result.uri) -> {
+                    result.uri = doWhenUriIsDownloadsDocument(result.uri)
                 }
-                isMediaDocument(uri) -> {
-                    val result = doWhenUriIsMediaDocument(uri)
-                    uri = result.uri
-                    selection = result.selection
-                    selectionArgs = result.selectionArgs
+                isMediaDocument(result.uri) -> {
+                    result = doWhenUriIsMediaDocument(result.uri)
                 }
             }
         }
-        if ("content".equals(uri.scheme!!, ignoreCase = true)) {
-            return searchPath(context,uri,selection,selectionArgs)
-        } else if ("file".equals(uri.scheme!!, ignoreCase = true)) {
-            return uri.path
+        if ("content".equals(result.uri.scheme!!, ignoreCase = true)) {
+            return searchPath(context,result.uri,result.selection,result.selectionArgs)
+        } else if ("file".equals(result.uri.scheme!!, ignoreCase = true)) {
+            return result.uri.path
         }
         return null
     }
-    
+
     /**
      * @param uri The Uri to check.
      * @return Whether the Uri authority is ExternalStorageProvider.
@@ -116,5 +111,5 @@ class PathUtil {
         return null
     }
 
-    data class Result(val uri: Uri, val selection: String?, val selectionArgs:Array<String>?)
+    data class Result(var uri: Uri, var selection: String?, var selectionArgs:Array<String>?)
 }
