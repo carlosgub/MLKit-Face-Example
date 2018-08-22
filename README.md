@@ -1,19 +1,20 @@
 # MLKit-Face-Example
 Este es un ejemplo de la libreria de MLKit de Firebase
 
-Este ejemplo reconoce a las personas cuando se captura la imagen con la camara.
+Este ejemplo reconoce a las personas cuando se captura la imagen con la camara o cuando se selecciona alguna imagen de la galeria.
 
-![](prueba_app.gif)
+<img src="/gif/example.gif" height="420" />
 
 # Pasos para poder compilar la repo
+
 * Agregar el archivo google-services.json de su proyecto de Firebase.
 * Compilar.
 
 ## Kotlin
 ---
- * Kotlin [1.2.50] - http://kotlinlang.org
+ * Kotlin [1.2.51] - http://kotlinlang.org
  
  ## Libraries
 ---
- * Dagger2 [2.11] - http://google.github.io/dagger
+ * Camerakit [0.13.1] - https://github.com/CameraKit/camerakit-android
  
