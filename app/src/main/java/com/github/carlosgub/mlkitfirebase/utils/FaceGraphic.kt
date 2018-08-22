@@ -86,18 +86,7 @@ class FaceGraphic(overlay: GraphicOverlay,mostrarLandmarks: Boolean) : Graphic(o
                 drawText(canvas,"left eye: " + String.format("%.2f", face.leftEyeOpenProbability), x - ID_X_OFFSET, y)
                 drawText(canvas,"right eye: " + String.format("%.2f", face.rightEyeOpenProbability), x + ID_X_OFFSET * 6, y)
             }
-
-            /** Dibuja en la cara los diferentes puntos que detecta la libreria de firebase */
-            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.BOTTOM_MOUTH)
-            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_CHEEK)
-            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_EAR)
-            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_MOUTH)
-            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_EYE)
-            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.NOSE_BASE)
-            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_CHEEK)
-            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EAR)
-            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EYE)
-            drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_MOUTH)
+            drawLandmarksFace(canvas,face)
         }
     }
 
@@ -114,6 +103,20 @@ class FaceGraphic(overlay: GraphicOverlay,mostrarLandmarks: Boolean) : Graphic(o
         val right = x + xOffset
         val bottom = y + yOffset
         canvas.drawRect(left, top, right, bottom, boxPaint)
+    }
+    
+    /** Dibuja en la cara los diferentes puntos que detecta la libreria de firebase */
+    private fun drawLandmarksFace(canvas: Canvas,face: FirebaseVisionFace){
+        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.BOTTOM_MOUTH)
+        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_CHEEK)
+        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_EAR)
+        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_MOUTH)
+        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_EYE)
+        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.NOSE_BASE)
+        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_CHEEK)
+        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EAR)
+        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EYE)
+        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_MOUTH)
     }
 
     /** Dibuja los puntos */
