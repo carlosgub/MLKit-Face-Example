@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.github.carlosgub.mlkitfirebase.R
 import com.github.carlosgub.mlkitfirebase.utils.FaceGraphic
-import com.github.carlosgub.mlkitfirebase.utils.PathUtil
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
@@ -23,8 +22,7 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import kotlinx.android.synthetic.main.activity_galeria.*
 import java.io.IOException
 import android.graphics.drawable.BitmapDrawable
-
-
+import com.github.carlosgub.mlkitfirebase.utils.PathUtil
 
 
 class GaleriaActivity : AppCompatActivity() {
@@ -59,7 +57,8 @@ class GaleriaActivity : AppCompatActivity() {
 
             if (data.data != null) {
                 var bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, Uri.parse(data.data.toString()))
-                bitmap =  modifyOrientation(bitmap,PathUtil.getPath(applicationContext,data.data))
+
+                bitmap =  modifyOrientation(bitmap,PathUtil().getPath(applicationContext,data.data)!!)
                 ivPhoto.setImageBitmap(bitmap)
 
                 mGraphicOverlayMenu.setCameraInfo(ivPhoto.drawable.intrinsicWidth,ivPhoto.drawable.intrinsicHeight,0)
