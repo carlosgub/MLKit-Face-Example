@@ -115,17 +115,17 @@ class GaleriaActivity : AppCompatActivity() {
     private fun rotate(bitmap: Bitmap, degrees: Float): Bitmap {
         val matrix = Matrix()
         matrix.postRotate(degrees)
-        return createBitmap(bitmap,0,0,matrix,true)
+        return createBitmap(bitmap,matrix,true)
     }
 
     /** Flip */
     private fun flip(bitmap: Bitmap, horizontal: Boolean, vertical: Boolean): Bitmap {
         val matrix = Matrix()
         matrix.preScale((if (horizontal) -1 else 1).toFloat(), (if (vertical) -1 else 1).toFloat())
-        return createBitmap(bitmap,0,0,matrix,true)
+        return createBitmap(bitmap,matrix,true)
     }
 
-    private fun createBitmap(bitmap: Bitmap,x:Int,y:Int,matrix:Matrix,boolean: Boolean):Bitmap{
-        return Bitmap.createBitmap(bitmap, x, y, bitmap.width, bitmap.height, matrix, boolean)
+    private fun createBitmap(bitmap: Bitmap,matrix:Matrix,boolean: Boolean):Bitmap{
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, boolean)
     }
 }
