@@ -21,7 +21,6 @@ class PathUtil {
         var uri = uri
         var selection: String? = null
         var selectionArgs: Array<String>? = null
-
         if (DocumentsContract.isDocumentUri(context.applicationContext, uri)) {
             when {
                 isExternalStorageDocument(uri) -> {
@@ -38,7 +37,6 @@ class PathUtil {
                 }
             }
         }
-
         if ("content".equals(uri.scheme!!, ignoreCase = true)) {
             return searchPath(context,uri,selection,selectionArgs)
         } else if ("file".equals(uri.scheme!!, ignoreCase = true)) {
@@ -46,8 +44,7 @@ class PathUtil {
         }
         return null
     }
-
-
+    
     /**
      * @param uri The Uri to check.
      * @return Whether the Uri authority is ExternalStorageProvider.
