@@ -7,12 +7,10 @@ import android.view.ViewGroup
 import com.github.carlosgub.mlkitfirebase.R
 import kotlinx.android.synthetic.main.item_menu.view.*
 
-class MenuRecyclerAdapter(val historialList: Array<String>,onClickListener: View.OnClickListener):RecyclerView.Adapter<MenuRecyclerAdapter.ViewHolder>() {
-
-    private var onClickListener: View.OnClickListener = onClickListener
+class MenuRecyclerAdapter(private val menuList: Array<String>, private var onClickListener: View.OnClickListener):RecyclerView.Adapter<MenuRecyclerAdapter.ViewHolder>() {
 
     override fun getItemCount():Int{
-        return historialList.size
+        return menuList.size
     }
 
 
@@ -20,7 +18,7 @@ class MenuRecyclerAdapter(val historialList: Array<String>,onClickListener: View
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         with(holder.itemView) {
-            val opcion = historialList[position]
+            val opcion = menuList[position]
             holder.itemView.tvTextoMenu.text = opcion
             holder.itemView.mainLayout.setOnClickListener(onClickListener)
         }

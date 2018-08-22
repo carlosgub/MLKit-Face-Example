@@ -24,13 +24,9 @@ class MainActivity : AppCompatActivity() {
 
         /** Listener de la camara */
         mCameraView.addCameraKitListener(object : CameraKitEventListener {
-            override fun onEvent(cameraKitEvent: CameraKitEvent) {
+            override fun onEvent(cameraKitEvent: CameraKitEvent) {}
 
-            }
-
-            override fun onError(cameraKitError: CameraKitError) {
-
-            }
+            override fun onError(cameraKitError: CameraKitError) {}
 
             /** Poner codigo de la camara */
             override fun onImage(cameraKitImage: CameraKitImage) {
@@ -38,12 +34,9 @@ class MainActivity : AppCompatActivity() {
                 bitmap = Bitmap.createScaledBitmap(bitmap, mCameraView.width, mCameraView.height, false)
                 mCameraView.stop()
                 FaceDetectionFirebase(mGraphicOverlay,applicationContext).runFaceRecognition(bitmap)
-
             }
 
-            override fun onVideo(cameraKitVideo: CameraKitVideo) {
-
-            }
+            override fun onVideo(cameraKitVideo: CameraKitVideo) {}
         })
 
         /** Logica cuando se presiona el boton de tomar foto */
@@ -72,9 +65,7 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
-            @SuppressLint("ClickableViewAccessibility")
             override fun onTouch(v: View, event: MotionEvent): Boolean {
-
                 gestureDetector.onTouchEvent(event)
                 return true
             }

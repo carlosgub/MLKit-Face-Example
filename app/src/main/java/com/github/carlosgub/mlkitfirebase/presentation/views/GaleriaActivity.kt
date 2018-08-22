@@ -34,8 +34,9 @@ class GaleriaActivity : AppCompatActivity() {
         }
     }
 
+    /** Intent hacia la galeria */
     private fun intent(){
-        /** Intent hacia la galeria */
+
         val intentGallery = Intent(Intent.ACTION_OPEN_DOCUMENT)
         intentGallery.putExtra(Intent.EXTRA_LOCAL_ONLY, true)
         intentGallery.addCategory(Intent.CATEGORY_OPENABLE)
@@ -92,10 +93,7 @@ class GaleriaActivity : AppCompatActivity() {
                 }
             }
         }
-
     }
-
-
 
     /** Rotar la imagen, si esta rotada en una direccion incorrecta*/
     @Throws(IOException::class)
@@ -105,15 +103,10 @@ class GaleriaActivity : AppCompatActivity() {
 
         return when (orientation) {
             ExifInterface.ORIENTATION_ROTATE_90 -> rotate(bitmap, 90f)
-
             ExifInterface.ORIENTATION_ROTATE_180 -> rotate(bitmap, 180f)
-
             ExifInterface.ORIENTATION_ROTATE_270 -> rotate(bitmap, 270f)
-
             ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> flip(bitmap, true, false)
-
             ExifInterface.ORIENTATION_FLIP_VERTICAL -> flip(bitmap, false, true)
-
             else -> bitmap
         }
     }
