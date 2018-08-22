@@ -25,45 +25,22 @@ class PathUtil {
         if (DocumentsContract.isDocumentUri(context.applicationContext, uri)) {
             when {
                 isExternalStorageDocument(uri) -> {
-                    val docId = DocumentsContract.getDocumentId(uri)
-                    val split = getDocumentsContract(docId)
-                    return Environment.getExternalStorageDirectory().toString() + "/" + split[1]
+                    return doWhenUriIsExternalStorageDocument(uri)
                 }
                 isDownloadsDocument(uri) -> {
-                    val id = DocumentsContract.getDocumentId(uri)
-                    uri = ContentUris.withAppendedId(
-                            Uri.parse("content://downloads/public_downloads"), java.lang.Long.valueOf(id))
+                    uri = doWhenUriIsDownloadsDocument(uri)
                 }
                 isMediaDocument(uri) -> {
-                    val docId = DocumentsContract.getDocumentId(uri)
-                    val split = getDocumentsContract(docId)
-                    val type = split[0]
-                    if ("image" == type) {
-                        uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                    } else if ("video" == type) {
-                        uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                    } else if ("audio" == type) {
-                        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-                    }
-                    selection = "_id=?"
-                    selectionArgs = arrayOf(split[1])
+                    val result = doWhenUriIsMediaDocument(uri)
+                    uri = result.uri
+                    selection = result.selection
+                    selectionArgs = result.selectionArgs
                 }
             }
         }
-        if ("content".equals(uri.scheme!!, ignoreCase = true)) {
-            val projection = arrayOf(MediaStore.Images.Media.DATA)
-            val cursor: Cursor?
-            try {
-                cursor = context.contentResolver.query(uri, projection, selection, selectionArgs, null)
-                val column_index = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-                if (cursor.moveToFirst()) {
-                    val valor = cursor.getString(column_index)
-                    cursor.close()
-                    return valor
-                }
-            } catch (e: Exception) {
-            }
 
+        if ("content".equals(uri.scheme!!, ignoreCase = true)) {
+            return searchPath(context,uri,selection,selectionArgs)
         } else if ("file".equals(uri.scheme!!, ignoreCase = true)) {
             return uri.path
         }
@@ -98,4 +75,49 @@ class PathUtil {
     private fun getDocumentsContract(docId:String):Array<String>{
         return docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
     }
+
+    private fun doWhenUriIsExternalStorageDocument(uri:Uri):String{
+        val docId = DocumentsContract.getDocumentId(uri)
+        val split = getDocumentsContract(docId)
+        return Environment.getExternalStorageDirectory().toString() + "/" + split[1]
+    }
+
+    private fun doWhenUriIsDownloadsDocument(uri: Uri):Uri{
+        val id = DocumentsContract.getDocumentId(uri)
+        return ContentUris.withAppendedId(
+                Uri.parse("content://downloads/public_downloads"), java.lang.Long.valueOf(id))
+    }
+
+    private fun doWhenUriIsMediaDocument(uri: Uri):Result{
+        var uri = uri
+        val docId = DocumentsContract.getDocumentId(uri)
+        val split = getDocumentsContract(docId)
+        val type = split[0]
+        when (type) {
+            "image" -> uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            "video" -> uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            "audio" -> uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        }
+        val selection = "_id=?"
+        val selectionArgs = arrayOf(split[1])
+        return Result(uri,selection,selectionArgs)
+    }
+
+    private fun searchPath(context: Context,uri:Uri,selection: String?,selectionArgs: Array<String>?) : String?{
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor: Cursor?
+        try {
+            cursor = context.contentResolver.query(uri, projection, selection, selectionArgs, null)
+            val column_index = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            if (cursor.moveToFirst()) {
+                val valor = cursor.getString(column_index)
+                cursor.close()
+                return valor
+            }
+        } catch (e: Exception) {
+        }
+        return null
+    }
+
+    data class Result(val uri: Uri, val selection: String?, val selectionArgs:Array<String>?)
 }

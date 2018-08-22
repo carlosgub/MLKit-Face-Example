@@ -104,7 +104,7 @@ class FaceGraphic(overlay: GraphicOverlay,mostrarLandmarks: Boolean) : Graphic(o
         val bottom = y + yOffset
         canvas.drawRect(left, top, right, bottom, boxPaint)
     }
-    
+
     /** Dibuja en la cara los diferentes puntos que detecta la libreria de firebase */
     private fun drawLandmarksFace(canvas: Canvas,face: FirebaseVisionFace){
         drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.BOTTOM_MOUTH)
