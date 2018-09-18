@@ -7,5 +7,3 @@ app/google-services\.json
 *.lock
 
 *.bin
-
-*.xml
