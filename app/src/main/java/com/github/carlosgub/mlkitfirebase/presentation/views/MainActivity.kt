@@ -105,6 +105,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onDoubleTap(e: MotionEvent): Boolean {
                     mGraphicOverlay.clear()
                     changeCamera()
+                    ivPhoto.setImageDrawable(null)
                     return super.onDoubleTap(e)
                 }
 
