@@ -4,15 +4,17 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.support.media.ExifInterface
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.widget.Toast
 import com.github.carlosgub.mlkitfirebase.R
 import com.github.carlosgub.mlkitfirebase.utils.FaceDetectionFirebase
@@ -50,21 +52,29 @@ class GaleriaActivity : AppCompatActivity() {
     /** Obtener la imagen de la galeria que se ha seleccionado */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
+        pb.indeterminateDrawable.setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN)
+        pb.visibility = View.VISIBLE
+        btGaleria.isEnabled=false
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
 
             if (data.data != null) {
                 var bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, Uri.parse(data.data.toString()))
-
                 bitmap =  modifyOrientation(bitmap,PathUtil().getPath(applicationContext,data.data)!!)
                 ivPhoto.setImageBitmap(bitmap)
 
                 mGraphicOverlayMenu.setCameraInfo(ivPhoto.drawable.intrinsicWidth,ivPhoto.drawable.intrinsicHeight,0)
-                FaceDetectionFirebase(mGraphicOverlayMenu,applicationContext).runFaceRecognition((ivPhoto.drawable as BitmapDrawable).bitmap)
+                FaceDetectionFirebase(mGraphicOverlayMenu).runFaceRecognition((ivPhoto.drawable as BitmapDrawable).bitmap){ callback->
+                    Toast.makeText(applicationContext,callback, Toast.LENGTH_SHORT).show()
+                    mGraphicOverlayMenu.clear()
+                    pb.visibility= View.GONE
+                    btGaleria.isEnabled=true
+                }
             } else{
                 Toast.makeText(this, "You haven't picked any Image",
                         Toast.LENGTH_LONG).show()
+                pb.visibility= View.GONE
+                btGaleria.isEnabled=true
             }
-
         }
     }
 
