@@ -64,9 +64,9 @@ class MainActivity : AppCompatActivity() {
 
         /** Logica cuando se presiona el boton de tomar foto */
         mCameraButton.setOnClickListener {
-            val permissionCheck = ContextCompat.checkSelfPermission(this,
+            val permissionChecks = ContextCompat.checkSelfPermission(this,
                     Manifest.permission.CAMERA)
-            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            if (permissionChecks == PackageManager.PERMISSION_GRANTED) {
                 if (ivPhoto.drawable==null){
                     pb.indeterminateDrawable.setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN)
                     pb.visibility = View.VISIBLE
@@ -144,7 +144,7 @@ class MainActivity : AppCompatActivity() {
     /** Rotar la imagen, si esta rotada en una direccion incorrecta*/
     @Throws(IOException::class)
     private fun modifyOrientation(bitmap: Bitmap, rotationDegrees: Int): Bitmap {
-        var bitmapsito:Bitmap = if(activeCamera==Camera.Front){
+        val bitmapsito:Bitmap = if(activeCamera==Camera.Front){
              flip(bitmap,false,true)
         }else{
             bitmap
@@ -189,9 +189,6 @@ class MainActivity : AppCompatActivity() {
         if (hasCameraPermission) {
             fotoapparat.stop()
         }
-    }
-
-    override fun onBackPressed() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -32,6 +32,7 @@ class FaceDetectionFirebase(private val mGraphicOverlay: GraphicOverlay) {
                 .addOnSuccessListener{ mensaje ->
                     processFaceRecognitionResult(mensaje){
                     callback(it)
+                    detector.close()
                 }}
                 .addOnFailureListener{ callback(it.toString())}
 

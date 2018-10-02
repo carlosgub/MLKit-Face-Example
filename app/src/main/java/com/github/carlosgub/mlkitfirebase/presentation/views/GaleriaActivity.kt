@@ -26,7 +26,7 @@ import java.io.IOException
 class GaleriaActivity : AppCompatActivity() {
 
     private val PICK_IMAGE = 1
-    private val STORAGE_PERMISSION = 300
+    private val STORAGE_PERMISSION = 301
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,31 +50,39 @@ class GaleriaActivity : AppCompatActivity() {
     }
 
     /** Obtener la imagen de la galeria que se ha seleccionado */
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        super.onActivityResult(requestCode, resultCode, data)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         pb.indeterminateDrawable.setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN)
         pb.visibility = View.VISIBLE
         btGaleria.isEnabled=false
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
-
-            if (data.data != null) {
+            if (data!!.data != null) {
                 var bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, Uri.parse(data.data.toString()))
                 bitmap =  modifyOrientation(bitmap,PathUtil().getPath(applicationContext,data.data)!!)
                 ivPhoto.setImageBitmap(bitmap)
 
                 mGraphicOverlayMenu.setCameraInfo(ivPhoto.drawable.intrinsicWidth,ivPhoto.drawable.intrinsicHeight,0)
                 FaceDetectionFirebase(mGraphicOverlayMenu).runFaceRecognition((ivPhoto.drawable as BitmapDrawable).bitmap){ callback->
-                    Toast.makeText(applicationContext,callback, Toast.LENGTH_SHORT).show()
-                    mGraphicOverlayMenu.clear()
+                    when(callback){
+                        "true"->{}
+                        else->{
+                            Toast.makeText(applicationContext,callback, Toast.LENGTH_SHORT).show()
+                            mGraphicOverlayMenu.clear()
+                        }
+                    }
                     pb.visibility= View.GONE
                     btGaleria.isEnabled=true
                 }
             } else{
-                Toast.makeText(this, "You haven't picked any Image",
+                Toast.makeText(this, "No haz seleccionado ninguna imagen",
                         Toast.LENGTH_LONG).show()
                 pb.visibility= View.GONE
                 btGaleria.isEnabled=true
             }
+        }else{
+            Toast.makeText(this, "No haz seleccionado ninguna imagen",
+                    Toast.LENGTH_LONG).show()
+            pb.visibility= View.GONE
+            btGaleria.isEnabled=true
         }
     }
 
