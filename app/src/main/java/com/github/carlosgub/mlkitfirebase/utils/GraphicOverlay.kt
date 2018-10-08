@@ -54,10 +54,6 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
      */
     abstract class Graphic(private val overlay: GraphicOverlay) {
 
-        /** Returns the application context of the app.  */
-        val applicationContext: Context
-            get() = overlay.context.applicationContext
-
         /**
          * Draw the graphic on the supplied canvas. Drawing should use the following methods to convert
          * to view coordinates for the graphics that are drawn:
@@ -120,14 +116,6 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
     fun add(graphic: Graphic) {
         synchronized(lock) {
             graphics.add(graphic)
-        }
-        postInvalidate()
-    }
-
-    /** Removes a graphic from the overlay.  */
-    fun remove(graphic: Graphic) {
-        synchronized(lock) {
-            graphics.remove(graphic)
         }
         postInvalidate()
     }
