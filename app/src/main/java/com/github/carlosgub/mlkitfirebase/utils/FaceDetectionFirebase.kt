@@ -31,12 +31,14 @@ class FaceDetectionFirebase(private val mGraphicOverlay: GraphicOverlay) {
         detector.detectInImage(image)
                 .addOnSuccessListener{ mensaje ->
                     processFaceRecognitionResult(mensaje){
-                    callback(it)
+                        callback(it) /** Retornar el mensaje de la funcion */
+                        detector.close()
+                    }
+                }
+                .addOnFailureListener{
+                    callback(it.toString()) /** Retornar el error de Firebase */
                     detector.close()
-                }}
-                .addOnFailureListener{ callback(it.toString())}
-
-        detector.close()
+                }
     }
 
     private fun processFaceRecognitionResult(firebaseVisionList: List<FirebaseVisionFace>,callback:(String)->Unit){
@@ -46,7 +48,7 @@ class FaceDetectionFirebase(private val mGraphicOverlay: GraphicOverlay) {
 
         /** Comprobar que hay caras en la imagen */
         if (firebaseVisionList.isEmpty()) {
-            callback("No se han detectado caras")
+            callback("No se han detectado caras") /** Retornar que no se encontro caras */
             return
         }
 
@@ -57,7 +59,7 @@ class FaceDetectionFirebase(private val mGraphicOverlay: GraphicOverlay) {
             mGraphicOverlay.add(textGraphic)
         }
 
-        callback("true")
+        callback("true") /** Retornar que fue exitoso */
     }
 
 }

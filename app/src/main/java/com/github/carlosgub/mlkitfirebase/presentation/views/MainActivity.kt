@@ -1,7 +1,6 @@
 package com.github.carlosgub.mlkitfirebase.presentation.views
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -16,19 +15,15 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import com.github.carlosgub.mlkitfirebase.R
+import com.github.carlosgub.mlkitfirebase.utils.Camera
 import com.github.carlosgub.mlkitfirebase.utils.FaceDetectionFirebase
 import io.fotoapparat.Fotoapparat
-import io.fotoapparat.configuration.CameraConfiguration
-import io.fotoapparat.log.logcat
 import io.fotoapparat.parameter.ScaleType
-import io.fotoapparat.selector.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
-
-    private val TAG = "PermissonMain"
     private val CAMERA_REQUEST_CODE = 101
     private val LOGGING_TAG = "Fotoapparat Example"
     private var hasCameraPermission: Boolean = false
@@ -40,29 +35,32 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
+        /**Verificar si se tiene el permiso de la camara*/
         val permissionCheck = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            /**No se tiene el permiso*/
             hasCameraPermission = false
-            Log.i(TAG, "Permission to record denied")
-            makeRequest()
+            makeRequest() /**Pedir permiso**/
         }else{
+            /**Si se tiene permiso*/
             hasCameraPermission = true
         }
 
+        /**Instanciar la camara**/
         fotoapparat = Fotoapparat(
-                context = this,
-                view = mCameraView,
-                logger = logcat(),
-                scaleType = ScaleType.CenterCrop,
-                lensPosition = activeCamera.lensPosition,
-                cameraConfiguration = activeCamera.configuration,
+                context = this, /**Contexto*/
+                view = mCameraView, /**id de la camara en el layout*/
+                scaleType = ScaleType.CenterCrop, /**Escala que se usara al tomar las fotos*/
+                lensPosition = activeCamera.lensPosition, /**Que camara se usara = Front or Back*/
+                cameraConfiguration = activeCamera.configuration, /**Configuracion de la camara*/
                 cameraErrorCallback = { Log.e(LOGGING_TAG, "Camera error: ", it) }
         )
 
 
-        /** Logica cuando se presiona el boton de tomar foto */
+        /** Lógica cuando se presiona el botón de tomar foto */
         mCameraButton.setOnClickListener {
             val permissionChecks = ContextCompat.checkSelfPermission(this,
                     Manifest.permission.CAMERA)
@@ -72,12 +70,12 @@ class MainActivity : AppCompatActivity() {
                     pb.visibility = View.VISIBLE
                     mCameraButton.isEnabled=false
                     val photoResult = fotoapparat.takePicture()
-
                     photoResult
                             .toBitmap()
                             .whenAvailable { bitmapPhoto ->
                                 val bitmap = modifyOrientation(bitmapPhoto!!.bitmap,bitmapPhoto.rotationDegrees)
                                 ivPhoto.setImageBitmap(bitmap)
+                                /**Lógica para detectar rostros de la imagen*/
                                 mGraphicOverlay.setCameraInfo(ivPhoto.drawable.intrinsicWidth,ivPhoto.drawable.intrinsicHeight,0)
                                 FaceDetectionFirebase(mGraphicOverlay).runFaceRecognition(bitmap) { callback->
                                     when(callback) {
@@ -103,9 +101,7 @@ class MainActivity : AppCompatActivity() {
         mGraphicOverlay.setOnTouchListener(object : View.OnTouchListener {
             private val gestureDetector = GestureDetector(applicationContext, object : GestureDetector.SimpleOnGestureListener() {
                 override fun onDoubleTap(e: MotionEvent): Boolean {
-                    mGraphicOverlay.clear()
                     changeCamera()
-                    ivPhoto.setImageDrawable(null)
                     return super.onDoubleTap(e)
                 }
 
@@ -171,6 +167,7 @@ class MainActivity : AppCompatActivity() {
         return createBitmap(bitmap,matrix,true)
     }
 
+    /**Crear bitmap desde un matrix*/
     private fun createBitmap(bitmap: Bitmap, matrix: Matrix, boolean: Boolean):Bitmap{
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, boolean)
     }
@@ -191,16 +188,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == 666) {
-            // Make sure the request was successful
-            if (resultCode == RESULT_OK) {
-                mGraphicOverlay.clear()
-                ivPhoto.setImageDrawable(null)
-            }
-        }
-    }
-
+    /** Funcion para cambiar la camara*/
     private fun changeCamera() {
         activeCamera = when (activeCamera) {
             Camera.Front -> Camera.Back
@@ -211,47 +199,15 @@ class MainActivity : AppCompatActivity() {
                 lensPosition = activeCamera.lensPosition,
                 cameraConfiguration = activeCamera.configuration
         )
+
+        /**Limpiar pantalla*/
+        mGraphicOverlay.clear()
+        ivPhoto.setImageDrawable(null)
     }
 }
 
 
-private sealed class Camera(
-        val lensPosition: LensPositionSelector,
-        val configuration: CameraConfiguration
-) {
 
-    object Back : Camera(
-            back(),
-            CameraConfiguration(
-                    previewResolution = firstAvailable(
-                            wideRatio(highestResolution()),
-                            standardRatio(highestResolution())
-                    ),
-                    previewFpsRange = highestFps(),
-                    flashMode = off(),
-                    focusMode = firstAvailable(
-                            continuousFocusPicture(),
-                            autoFocus()
-                    )
-            )
-    )
-
-    object Front : Camera(
-            lensPosition = front(),
-            configuration = CameraConfiguration(
-                    previewResolution = firstAvailable(
-                            wideRatio(highestResolution()),
-                            standardRatio(highestResolution())
-                    ),
-                    previewFpsRange = highestFps(),
-                    flashMode = off(),
-                    focusMode = firstAvailable(
-                            fixed(),
-                            autoFocus()
-                    )
-            )
-    )
-}
 
 
 
