@@ -84,11 +84,7 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
          * Adjusts the x coordinate from the preview's coordinate system to the view coordinate system.
          */
         fun translateX(x: Float): Float {
-            return if (overlay.facing == 1) {
-                overlay.width - scaleX(x)
-            } else {
-                scaleX(x)
-            }
+            return scaleX(x)
         }
 
         /**
@@ -123,11 +119,10 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
      * Sets the camera attributes for size and facing direction, which informs how to transform image
      * coordinates later.
      */
-    fun setCameraInfo(previewWidth: Int, previewHeight: Int, facing: Int) {
+    fun setCameraInfo(previewWidth: Int, previewHeight: Int) {
         synchronized(lock) {
             this.previewWidth = previewWidth
             this.previewHeight = previewHeight
-            this.facing = facing
         }
         postInvalidate()
     }
