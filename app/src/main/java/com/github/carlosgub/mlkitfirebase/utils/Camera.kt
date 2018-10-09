@@ -9,8 +9,8 @@ sealed class Camera(
 ) {
 
     object Back : Camera(
-            back(),
-            CameraConfiguration(
+            lensPosition = back(),
+            configuration = CameraConfiguration(
                     previewResolution = firstAvailable(
                             wideRatio(highestResolution()),
                             standardRatio(highestResolution())

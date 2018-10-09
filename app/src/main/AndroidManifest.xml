@@ -19,9 +19,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <meta-data
-            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
-            android:value="face" />
+
+        <!--Ingresar la dependencia de ML KIT-->
 
         <activity
             android:name=".presentation.views.MainActivity"

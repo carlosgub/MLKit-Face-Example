@@ -13,10 +13,8 @@ import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Toast
 import com.github.carlosgub.mlkitfirebase.R
 import com.github.carlosgub.mlkitfirebase.utils.Camera
-import com.github.carlosgub.mlkitfirebase.utils.FaceDetectionFirebase
 import io.fotoapparat.Fotoapparat
 import io.fotoapparat.parameter.ScaleType
 import kotlinx.android.synthetic.main.activity_main.*
@@ -75,20 +73,9 @@ class MainActivity : AppCompatActivity() {
                             .whenAvailable { bitmapPhoto ->
                                 val bitmap = modifyOrientation(bitmapPhoto!!.bitmap,bitmapPhoto.rotationDegrees)
                                 ivPhoto.setImageBitmap(bitmap)
+                                pb.visibility = View.GONE
+                                mCameraButton.isEnabled=true
                                 /**Lógica para detectar rostros de la imagen*/
-                                mGraphicOverlay.setCameraInfo(ivPhoto.drawable.intrinsicWidth,ivPhoto.drawable.intrinsicHeight,0)
-                                FaceDetectionFirebase(mGraphicOverlay).runFaceRecognition(bitmap) { callback->
-                                    when(callback) {
-                                        "true"->{}
-                                        else->{
-                                            Toast.makeText(applicationContext,callback, Toast.LENGTH_SHORT).show()
-                                            mGraphicOverlay.clear()
-                                            ivPhoto.setImageDrawable(null)
-                                        }
-                                    }
-                                    pb.visibility=View.GONE
-                                    mCameraButton.isEnabled=true
-                                }
                             }
                 }else{
                     mGraphicOverlay.clear()

@@ -38,7 +38,8 @@ dependencies {
 
     //Firebase
     implementation 'com.google.firebase:firebase-core:16.0.4'
-    implementation 'com.google.firebase:firebase-ml-vision:17.0.1'
+
+    //Firebase ML Kit
 
     //CameraKit
     implementation 'io.fotoapparat:fotoapparat:2.4.0'

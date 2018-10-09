@@ -17,7 +17,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.View
-import com.google.android.gms.vision.CameraSource
 
 /**
  * A view which renders a series of custom graphics to be overlayed on top of an associated preview
@@ -44,7 +43,7 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
     private var widthScaleFactor = 1.0f
     private var previewHeight: Int = 0
     private var heightScaleFactor = 1.0f
-    private var facing = CameraSource.CAMERA_FACING_BACK
+    private var facing:Int = 0
     private val graphics:HashSet<Graphic> = HashSet()
 
     /**
@@ -85,7 +84,7 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
          * Adjusts the x coordinate from the preview's coordinate system to the view coordinate system.
          */
         fun translateX(x: Float): Float {
-            return if (overlay.facing == CameraSource.CAMERA_FACING_FRONT) {
+            return if (overlay.facing == 1) {
                 overlay.width - scaleX(x)
             } else {
                 scaleX(x)
