@@ -9,3 +9,7 @@ app/google-services\.json
 *.bin
 
 \.idea/libraries/
+
+\.idea/misc\.xml
+
+\.idea/workspace\.xml
