@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.android.gms:play-services-vision-image-label-16.2.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../MLKit-Text-Example/caches/transforms-1/files-1.1/play-services-vision-image-label-16.2.0.aar/500966ee3ea5a3283d252afe305cd3ff/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../MLKit-Text-Example/caches/transforms-1/files-1.1/play-services-vision-image-label-16.2.0.aar/500966ee3ea5a3283d252afe305cd3ff/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

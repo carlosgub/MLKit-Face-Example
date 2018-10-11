@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.firebase:firebase-core-16.0.4">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../../MLKit-Text-Example/caches/transforms-1/files-1.1/firebase-core-16.0.4.aar/3f1636afa558ad914f50c4db11cb658e/res" />
+      <root url="jar://$PROJECT_DIR$/../../MLKit-Text-Example/caches/transforms-1/files-1.1/firebase-core-16.0.4.aar/3f1636afa558ad914f50c4db11cb658e/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,216 @@
+package com.github.carlosgub.mlkitfirebase.presentation.views
+
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.Matrix
+import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
+import android.support.v7.app.AppCompatActivity
+import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
+import android.view.View
+import android.widget.Toast
+import com.github.carlosgub.mlkitfirebase.R
+import com.github.carlosgub.mlkitfirebase.utils.Camera
+import com.github.carlosgub.mlkitfirebase.utils.FaceDetectionFirebase
+import io.fotoapparat.Fotoapparat
+import io.fotoapparat.parameter.ScaleType
+import kotlinx.android.synthetic.main.activity_main.*
+import java.io.IOException
+
+
+class MainActivity : AppCompatActivity() {
+    private val CAMERA_REQUEST_CODE = 101
+    private val LOGGING_TAG = "Fotoapparat Example"
+    private var hasCameraPermission: Boolean = false
+    private var activeCamera: Camera = Camera.Back
+
+    private lateinit var fotoapparat: Fotoapparat
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+
+        /**Verificar si se tiene el permiso de la camara*/
+        val permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA)
+
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            /**No se tiene el permiso*/
+            hasCameraPermission = false
+            makeRequest() /**Pedir permiso**/
+        }else{
+            /**Si se tiene permiso*/
+            hasCameraPermission = true
+        }
+
+        /**Instanciar la camara**/
+        fotoapparat = Fotoapparat(
+                context = this, /**Contexto*/
+                view = mCameraView, /**id de la camara en el layout*/
+                scaleType = ScaleType.CenterCrop, /**Escala que se usara al tomar las fotos*/
+                lensPosition = activeCamera.lensPosition, /**Que camara se usara = Front or Back*/
+                cameraConfiguration = activeCamera.configuration, /**Configuracion de la camara*/
+                cameraErrorCallback = { Log.e(LOGGING_TAG, "Camera error: ", it) }
+        )
+
+
+        /** Lógica cuando se presiona el botón de tomar foto */
+        mCameraButton.setOnClickListener {
+            val permissionChecks = ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.CAMERA)
+            if (permissionChecks == PackageManager.PERMISSION_GRANTED) {
+                if (ivPhoto.drawable==null){
+                    pb.indeterminateDrawable.setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN)
+                    pb.visibility = View.VISIBLE
+                    mCameraButton.isEnabled=false
+                    val photoResult = fotoapparat.takePicture()
+                    photoResult
+                            .toBitmap()
+                            .whenAvailable { bitmapPhoto ->
+                                val bitmap = modifyOrientation(bitmapPhoto!!.bitmap,bitmapPhoto.rotationDegrees)
+                                ivPhoto.setImageBitmap(bitmap)
+                                /**Lógica para detectar rostros de la imagen*/
+                                mGraphicOverlay.setCameraInfo(ivPhoto.drawable.intrinsicWidth,ivPhoto.drawable.intrinsicHeight)
+                                FaceDetectionFirebase(mGraphicOverlay).runFaceRecognition(bitmap) { callback->
+                                    /**Lógica para mostrar mensajes*/
+                                    when(callback) {
+                                        "true"->{}
+                                        else->{
+                                            Toast.makeText(applicationContext,callback, Toast.LENGTH_SHORT).show()
+                                            mGraphicOverlay.clear()
+                                            ivPhoto.setImageDrawable(null)
+                                        }
+                                    }
+
+                                    pb.visibility=View.GONE
+                                    mCameraButton.isEnabled=true
+                                }
+
+                            }
+                }else{
+                    mGraphicOverlay.clear()
+                    ivPhoto.setImageDrawable(null)
+                }
+            }
+        }
+
+        /** Listener para cambiar de camara cuando se hace doble tab a la pantalla */
+        mGraphicOverlay.setOnTouchListener(object : View.OnTouchListener {
+            private val gestureDetector = GestureDetector(applicationContext, object : GestureDetector.SimpleOnGestureListener() {
+                override fun onDoubleTap(e: MotionEvent): Boolean {
+                    changeCamera()
+                    return super.onDoubleTap(e)
+                }
+
+                override fun onSingleTapConfirmed(event: MotionEvent): Boolean {
+                    return false
+                }
+            })
+
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                gestureDetector.onTouchEvent(event)
+                return true
+            }
+        })
+
+    }
+
+    private fun makeRequest() {
+        ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.CAMERA),
+                CAMERA_REQUEST_CODE)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            CAMERA_REQUEST_CODE -> {
+
+                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    makeRequest()
+                } else {
+                    fotoapparat.start()
+                }
+            }
+        }
+    }
+
+    /** Rotar la imagen, si esta rotada en una direccion incorrecta*/
+    @Throws(IOException::class)
+    private fun modifyOrientation(bitmap: Bitmap, rotationDegrees: Int): Bitmap {
+        val bitmapsito:Bitmap = if(activeCamera==Camera.Front){
+             flip(bitmap,false,true)
+        }else{
+            bitmap
+        }
+        return when (rotationDegrees) {
+            90 -> rotate(bitmapsito, 270f)
+            180 -> rotate(bitmapsito, 180f)
+            270 -> rotate(bitmapsito, 90f)
+            else -> bitmapsito
+        }
+    }
+
+    /** Rotar */
+    private fun rotate(bitmap: Bitmap, degrees: Float): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(degrees)
+        return createBitmap(bitmap,matrix,true)
+    }
+
+    /** Flip */
+    private fun flip(bitmap: Bitmap, horizontal: Boolean, vertical: Boolean): Bitmap {
+        val matrix = Matrix()
+        matrix.preScale((if (horizontal) -1 else 1).toFloat(), (if (vertical) -1 else 1).toFloat())
+        return createBitmap(bitmap,matrix,true)
+    }
+
+    /**Crear bitmap desde un matrix*/
+    private fun createBitmap(bitmap: Bitmap, matrix: Matrix, boolean: Boolean):Bitmap{
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, boolean)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mGraphicOverlay.clear()
+        if (hasCameraPermission) {
+            fotoapparat.start()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mGraphicOverlay.clear()
+        if (hasCameraPermission) {
+            fotoapparat.stop()
+        }
+    }
+
+    /** Funcion para cambiar la camara*/
+    private fun changeCamera() {
+        activeCamera = when (activeCamera) {
+            Camera.Front -> Camera.Back
+            Camera.Back -> Camera.Front
+        }
+
+        fotoapparat.switchTo(
+                lensPosition = activeCamera.lensPosition,
+                cameraConfiguration = activeCamera.configuration
+        )
+
+        /**Limpiar pantalla*/
+        mGraphicOverlay.clear()
+        ivPhoto.setImageDrawable(null)
+    }
+}
+
+
+
+
+
+

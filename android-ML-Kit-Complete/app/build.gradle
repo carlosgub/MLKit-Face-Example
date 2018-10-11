@@ -1,0 +1,48 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
+    defaultConfig {
+        applicationId "com.github.carlosgub.mlkitfirebase"
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    //Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    //Android Support
+    implementation "com.android.support:appcompat-v7:$support"
+    implementation "com.android.support:support-v4:$support"
+    implementation "com.android.support:animated-vector-drawable:$support"
+    implementation "com.android.support:support-media-compat:$support"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation "com.android.support:recyclerview-v7:$support"
+    implementation "com.android.support:cardview-v7:$support"
+
+
+    //Firebase
+    implementation 'com.google.firebase:firebase-core:16.0.4'
+
+    //Firebase ML Kit
+    implementation 'com.google.firebase:firebase-ml-vision:17.0.1'
+
+    //CameraKit
+    implementation 'io.fotoapparat:fotoapparat:2.4.0'
+}
+apply plugin: 'com.google.gms.google-services'

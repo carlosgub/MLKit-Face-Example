@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: io.fotoapparat:fotoapparat-2.4.0">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../../MLKit-Text-Example/caches/transforms-1/files-1.1/fotoapparat-2.4.0.aar/e8e8bd9533a19c02d7f13b4ee358a2a0/res" />
+      <root url="jar://$PROJECT_DIR$/../../MLKit-Text-Example/caches/transforms-1/files-1.1/fotoapparat-2.4.0.aar/e8e8bd9533a19c02d7f13b4ee358a2a0/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../MLKit-Text-Example/caches/modules-2/files-2.1/io.fotoapparat/fotoapparat/2.4.0/592636ba72ac5b7a4dbc8b8de100b8cb43abcd39/fotoapparat-2.4.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
