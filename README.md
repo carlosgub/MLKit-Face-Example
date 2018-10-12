@@ -8,7 +8,7 @@ Este ejemplo reconoce a las personas cuando se captura la imagen con la camara d
 
 # Pasos para realizar el codelab de ML Kit
 
-* Descargar la extensión de Google Chrome https://chrome.google.com/webstore/detail/preview-codelab/lhojjnijnkiglhkggagbapfonpdlinji.
+* Descargar e instalar la extensión la siguiente extensión de Google Chrome https://chrome.google.com/webstore/detail/preview-codelab/lhojjnijnkiglhkggagbapfonpdlinji.
 * Ingresar al siguiente Google Doc https://docs.google.com/document/d/1sQQovDTwHRgH2-JlOI9H5yCtVwUFVPd4_gX2nIbZnxA/edit?usp=sharing
 * Hacer clic al botón de la extensión cuando te encuentres en la pestaña donde estas visualizando el Google Doc.
 <img src="https://lh3.googleusercontent.com/IwT4c3_KKYLhytbK7HCcMrl-P64Y1qgJgETTeh1Fxt6H-eJnGm1mVErdC_mwhUoor9T1E3CN9AA=w128-h128-e365" height="100"/>
