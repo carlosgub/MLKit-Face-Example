@@ -2,30 +2,34 @@
 
 Este es un ejemplo de la libreria de MLKit de Firebase
 
-Este ejemplo reconoce a las personas cuando se captura la imagen con la camara o cuando se selecciona alguna imagen de la galeria.
+Este ejemplo reconoce a las personas cuando se captura la imagen con la camara del celular.
 
 <img src="/gif/example.gif" height="420" />
+
+# Pasos para realizar el codelab de ML Kit
+
+* Descargar la extensión de Google Chrome https://chrome.google.com/webstore/detail/preview-codelab/lhojjnijnkiglhkggagbapfonpdlinji.
+* Ingresar al siguiente Google Doc https://docs.google.com/document/d/1sQQovDTwHRgH2-JlOI9H5yCtVwUFVPd4_gX2nIbZnxA/edit?usp=sharing
+* Hacer clic al botón de la extensión cuando te encuentres en la pestaña donde estas visualizando el Google Doc.
+<img src="https://lh3.googleusercontent.com/IwT4c3_KKYLhytbK7HCcMrl-P64Y1qgJgETTeh1Fxt6H-eJnGm1mVErdC_mwhUoor9T1E3CN9AA=w128-h128-e365" height="100"/>
+* Veras el Google Doc de la siguiente manera.
+<img src="https://i.imgur.com/kxcwtZT.png"/>
 
 # Pasos para poder compilar la repo
 
 * Agregar el archivo google-services.json de su proyecto de Firebase.
 * Compilar.
-
-## Historial de versiones actuales y futuras
----
- * V 0.5 - App con menu con opccion de tomar foto o elegir imagen de la galeria con la libreria de ML Kit
- * V 0.8 (Version Actual) - Refactoring del codigo.
- * V 1.0 )En trabajo) - Mejora de la opcion de tomar imagen y arreglar el UI
- * V 1.5 - Mejora de la opcion de elegir imagen de la Galería (FIT XY)
- * V 2.0 - Ultima versión con los comentarios añadidos al codigo.
  
 ## Kotlin
 ---
- * Kotlin [1.2.51] - http://kotlinlang.org
+ * Kotlin [1.2.61] - http://kotlinlang.org
  
- ## Librarias
+ ## Librerías
 ---
- * Camerakit [0.13.1] - https://github.com/CameraKit/camerakit-android
+ * fotoapparat [2.4.0] - https://github.com/RedApparat/Fotoapparat
  
+# Sugerencias
 
+* Cualquier sugerencia sobre el codelab o el ejemplo ponerlo como issue.
+* Gracias.
  
